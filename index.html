@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Sky For You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: one night sky you light up star by star; the stars become a heart, then a question waits below. */
+:root {
+  --night: #0b0d24;
+  --night-2: #151a3d;
+  --ink: #f3eee6;
+  --muted: #a9abc9;
+  --star: #ffe9b8;
+  --rose: #ff8fa8;
+  --line: rgba(255, 233, 184, .55);
+  --display: "Instrument Serif", "Georgia", serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --hand: "Caveat", "Segoe Print", cursive;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--night); color: var(--ink); }
+body {
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 16px;
+  overflow-x: hidden;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #2a2462 0%, transparent 60%),
+    radial-gradient(900px 500px at 0% 40%, #1b2150 0%, transparent 60%),
+    var(--night);
+}
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 40px 80px; display: grid; gap: 56px; }
+
+header { display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+h1 {
+  font-family: var(--display); font-weight: 400; margin: 0;
+  font-size: clamp(44px, 9vw, 104px); line-height: .95; letter-spacing: -.01em;
+  text-wrap: balance;
+}
+h1 em { color: var(--star); }
+.lede { max-width: 52ch; color: var(--muted); margin: 6px 0 0; font-size: 17px; }
+
+.sky {
+  position: relative; width: 100%; aspect-ratio: 16 / 10; max-width: 100%;
+  border-radius: 18px; overflow: hidden;
+  background: linear-gradient(180deg, #0a0c22 0%, #141a44 100%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 30px 80px -30px #000;
+}
+@media (max-width: 560px) { .sky { aspect-ratio: 4 / 5; } }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.star-btn {
+  position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 50%;
+}
+.star-btn:focus-visible { outline: 2px solid var(--star); outline-offset: 2px; }
+.sky-hint {
+  position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
+  font-size: 13px; color: var(--muted); pointer-events: none; transition: opacity .6s;
+}
+.sky-title {
+  position: absolute; left: 0; right: 0; top: 18px; text-align: center; pointer-events: none;
+  font-family: var(--display); font-style: italic; font-size: clamp(20px, 3.4vw, 30px); color: var(--star);
+  opacity: 0; transform: translateY(6px); transition: opacity 1.2s, transform 1.2s;
+}
+.sky-title small { display: block; font-family: var(--body); font-style: normal; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+.sky.done .sky-title { opacity: 1; transform: none; }
+.sky.done .sky-hint { opacity: 0; }
+
+.note {
+  position: absolute; max-width: min(260px, 70%); padding: 12px 16px 14px;
+  background: #fbf6ec; color: #2b2340; border-radius: 4px;
+  font-family: var(--hand); font-size: 22px; line-height: 1.2;
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,.6);
+  transform: translate(-50%, calc(-100% - 22px)) rotate(var(--tilt, -2deg));
+  animation: pop .45s cubic-bezier(.2,1.4,.4,1);
+  pointer-events: none; z-index: 3;
+}
+.note b { display: block; font-family: var(--body); font-weight: 600; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #b04a66; margin-bottom: 2px; }
+@keyframes pop { from { opacity: 0; transform: translate(-50%, calc(-100% - 10px)) rotate(var(--tilt, -2deg)) scale(.85); } }
+
+.reasons { display: grid; gap: 14px; }
+.reasons h2, .ask h2 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 5vw, 46px); margin: 0; line-height: 1.05; text-wrap: balance; }
+.reasons ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 28px; }
+.reasons li { display: grid; grid-template-columns: 30px 1fr; gap: 6px; padding-block: 10px; border-top: 1px solid rgba(255,255,255,.09); min-width: 0; color: var(--muted); transition: color .5s; }
+.reasons li span { font-family: var(--display); font-style: italic; color: rgba(255,233,184,.35); font-size: 20px; line-height: 1.2; transition: color .5s; }
+.reasons li.lit { color: var(--ink); }
+.reasons li.lit span { color: var(--star); }
+.reasons li .hidden-text { filter: blur(5px); user-select: none; transition: filter .6s; }
+.reasons li.lit .hidden-text { filter: none; }
+
+.days { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.days .num { font-family: var(--display); font-size: clamp(56px, 12vw, 120px); line-height: 1; color: var(--star); font-variant-numeric: tabular-nums; }
+.days p { margin: 0; color: var(--muted); max-width: 34ch; }
+
+.ask { display: grid; gap: 18px; justify-items: start; padding: 32px; border-radius: 18px; background: var(--night-2); position: relative; min-height: 260px; }
+.ask p { margin: 0; color: var(--muted); max-width: 50ch; }
+.btns { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; min-height: 52px; }
+.btn { font: 600 16px var(--body); border: 0; border-radius: 999px; padding: 14px 26px; cursor: pointer; transition: transform .2s; }
+.btn:focus-visible { outline: 2px solid var(--star); outline-offset: 3px; }
+.yes { background: var(--rose); color: #2a0f1a; }
+.yes:hover { transform: scale(1.05); }
+.no { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); transition: left .25s, top .25s; }
+.no.run { position: absolute; }
+.answer { font-family: var(--hand); font-size: 30px; color: var(--star); }
+footer { color: var(--muted); font-size: 13px; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">For you, tonight</div>
+    <h1>Hey <em id="her-name">Ummu Kulsuuuu</em>,<br>look up.</h1>
+    <p class="lede">I couldn't fit everything I feel into a text, so I hid it in the sky. Tap each star to light it up.</p>
+  </header>
+
+  <section class="sky" id="sky" aria-label="A sky of stars. Tap each star to reveal a note.">
+    <canvas id="c"></canvas>
+    <div class="sky-title" id="sky-title">Constellation of Us<small id="sky-sub">first charted 8 February</small></div>
+    <div class="sky-hint" id="hint">0 of 9 stars lit</div>
+  </section>
+
+  <section class="reasons" aria-live="polite">
+    <h2>Nine things the stars know</h2>
+    <ol id="list"></ol>
+  </section>
+
+  <section class="days" id="days">
+    <div class="num" id="day-count">8 Feb</div>
+    <p id="day-text">the day you walked into my life. Every day since has been better for it.</p>
+  </section>
+
+  <section class="ask" id="ask">
+    <h2>Ummu Kulsuuuu, will you marry me?</h2>
+    <p id="ask-text">Will you let me take you out this weekend? Dinner, a long walk, and no phones allowed.</p>
+    <div class="btns" id="btns">
+      <button class="btn yes" id="yes">Yes, forever</button>
+      <button class="btn no" id="no">No</button>
+    </div>
+  </section>
+
+  <footer>Made with love by <span id="from-name">me</span></footer>
+</div>
+
+<script>
+/* ---------- Personalize here ---------- */
+const CONFIG = {
+  herName: "Ummu Kulsuuuu",
+  fromName: "me",
+  startDate: "",                    // add the year (YYYY-02-08) to show a day count
+  reasons: [
+    "The way you laugh at your own jokes before you finish them.",
+    "You make ordinary Tuesdays feel like a holiday.",
+    "How you always steal the last bite and pretend you didn't.",
+    "You're the first person I want to tell everything to.",
+    "Your hand fits mine like it was made for it.",
+    "You're kind even when nobody's watching.",
+    "The face you make when you're concentrating. Adorable.",
+    "You believe in me on the days I don't.",
+    "Every plan I make for the future has you in it. Every single one."
+  ],
+  question: "Nine stars weren't enough to say it, so I'll just ask. Will you marry me?",
+  yesReply: "You just made me the happiest person alive. ♡"
+};
+/* -------------------------------------- */
+
+const $ = id => document.getElementById(id);
+$("her-name").textContent = CONFIG.herName;
+$("from-name").textContent = CONFIG.fromName;
+$("ask-text").textContent = CONFIG.question;
+
+// days together
+(function () {
+  const start = new Date(CONFIG.startDate + "T00:00:00");
+  if (isNaN(start)) return;
+  const days = Math.max(0, Math.floor((Date.now() - start) / 86400000));
+  $("day-count").textContent = days.toLocaleString();
+  $("day-text").textContent = "days since 8 February, when you walked into my life. Every one of them has been better for it.";
+})();
+
+// reasons list
+const list = $("list");
+CONFIG.reasons.forEach((r, i) => {
+  const li = document.createElement("li");
+  li.innerHTML = `<span>${i + 1}</span><div class="hidden-text"></div>`;
+  li.querySelector(".hidden-text").textContent = r;
+  list.appendChild(li);
+});
+
+// sky
+const sky = $("sky"), canvas = $("c"), ctx = canvas.getContext("2d");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let W = 0, H = 0, dpr = 1, bg = [];
+const N = CONFIG.reasons.length;
+
+// heart points, ordered around the outline
+function heartPoints(n) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = Math.PI - (i / n) * Math.PI * 2; // start at the bottom tip
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+    pts.push({ x: x / 34, y: -y / 34 });
+  }
+  return pts;
+}
+const shape = heartPoints(N);
+const stars = shape.map((p, i) => ({ ...p, lit: false, litAt: 0, idx: i }));
+let litOrder = [];
+let doneAt = 0;
+
+function place() {
+  const r = sky.getBoundingClientRect();
+  W = r.width; H = r.height; dpr = Math.min(2, devicePixelRatio || 1);
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const s = Math.min(W, H) * 0.95;
+  stars.forEach(st => { st.px = W / 2 + st.x * s; st.py = H * 0.52 + st.y * s; });
+  if (!bg.length) {
+    for (let i = 0; i < 260; i++) bg.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 + .2, p: Math.random() * 6.28, s: Math.random() * .8 + .3 });
+  }
+  stars.forEach(st => {
+    st.btn.style.left = st.px + "px";
+    st.btn.style.top = st.py + "px";
+    if (st.note) { st.note.style.left = st.px + "px"; st.note.style.top = st.py + "px"; }
+  });
+}
+
+stars.forEach((st, i) => {
+  const b = document.createElement("button");
+  b.className = "star-btn";
+  b.setAttribute("aria-label", `Star ${i + 1}`);
+  b.addEventListener("click", () => light(st));
+  sky.appendChild(b);
+  st.btn = b;
+});
+
+let openNote = null;
+function light(st) {
+  if (openNote) { openNote.remove(); openNote = null; }
+  const note = document.createElement("div");
+  note.className = "note";
+  note.style.setProperty("--tilt", (Math.random() * 6 - 3).toFixed(1) + "deg");
+  note.innerHTML = `<b>No. ${st.idx + 1}</b>`;
+  note.append(CONFIG.reasons[st.idx]);
+  note.style.left = st.px + "px"; note.style.top = st.py + "px";
+  // keep notes near the top from leaving the sky
+  if (st.py < H * 0.35) note.style.transform = "translate(-50%, 26px) rotate(var(--tilt))";
+  sky.appendChild(note);
+  openNote = note;
+
+  if (!st.lit) {
+    st.lit = true; st.litAt = performance.now(); litOrder.push(st);
+    list.children[st.idx].classList.add("lit");
+    $("hint").textContent = `${litOrder.length} of ${N} stars lit`;
+    if (litOrder.length === N) {
+      doneAt = performance.now();
+      setTimeout(() => { if (openNote) { openNote.remove(); openNote = null; } sky.classList.add("done"); }, 1800);
+    }
+  }
+}
+
+function draw(now) {
+  ctx.clearRect(0, 0, W, H);
+  // background twinkle
+  for (const b of bg) {
+    const a = reduce ? .6 : .35 + .35 * Math.sin(now / 900 * b.s + b.p);
+    ctx.fillStyle = `rgba(230,228,255,${a})`;
+    ctx.beginPath(); ctx.arc(b.x * W, b.y * H, b.r, 0, 6.283); ctx.fill();
+  }
+  // lines: connect lit stars in heart order, closing when complete
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--line");
+  ctx.lineWidth = 1.2;
+  for (let i = 0; i < N; i++) {
+    const a = stars[i], b = stars[(i + 1) % N];
+    if (a.lit && b.lit) {
+      const t = reduce ? 1 : Math.min(1, (now - Math.max(a.litAt, b.litAt)) / 700);
+      ctx.beginPath(); ctx.moveTo(a.px, a.py);
+      ctx.lineTo(a.px + (b.px - a.px) * t, a.py + (b.py - a.py) * t); ctx.stroke();
+    }
+  }
+  // heart glow on completion
+  if (doneAt) {
+    const g = reduce ? 1 : Math.min(1, (now - doneAt) / 1500);
+    ctx.save(); ctx.globalAlpha = .22 * g; ctx.fillStyle = "#ff8fa8";
+    ctx.shadowColor = "#ff8fa8"; ctx.shadowBlur = 40;
+    ctx.beginPath(); stars.forEach((s, i) => i ? ctx.lineTo(s.px, s.py) : ctx.moveTo(s.px, s.py));
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  // the nine stars
+  for (const s of stars) {
+    const pulse = reduce ? 1 : 1 + .25 * Math.sin(now / 500 + s.idx);
+    const r = s.lit ? 4.5 : 2.6 * pulse;
+    const grad = ctx.createRadialGradient(s.px, s.py, 0, s.px, s.py, r * 6);
+    grad.addColorStop(0, s.lit ? "rgba(255,233,184,.9)" : "rgba(255,233,184,.45)");
+    grad.addColorStop(1, "rgba(255,233,184,0)");
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(s.px, s.py, r * 6, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "#fff6e0"; ctx.beginPath(); ctx.arc(s.px, s.py, r, 0, 6.283); ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+
+addEventListener("resize", place);
+place();
+requestAnimationFrame(draw);
+
+// the question
+const no = $("no"), ask = $("ask");
+const dodges = ["No", "Are you sure?", "Ummu, really?", "Think again", "Only \"Yes\" works here"];
+let d = 0;
+function dodge() {
+  const a = ask.getBoundingClientRect(), b = no.getBoundingClientRect();
+  no.classList.add("run");
+  no.textContent = dodges[Math.min(++d, dodges.length - 1)];
+  const x = Math.random() * Math.max(0, a.width - b.width - 32) + 16;
+  const y = Math.random() * Math.max(0, a.height - b.height - 32) + 16;
+  no.style.left = x + "px"; no.style.top = y + "px";
+}
+no.addEventListener("mouseenter", dodge);
+no.addEventListener("click", e => { e.preventDefault(); dodge(); });
+
+$("yes").addEventListener("click", () => {
+  $("btns").innerHTML = "";
+  const p = document.createElement("div");
+  p.className = "answer"; p.textContent = CONFIG.yesReply;
+  $("btns").appendChild(p);
+  burst();
+});
+
+function burst() {
+  if (reduce) return;
+  for (let i = 0; i < 28; i++) {
+    const h = document.createElement("span");
+    h.textContent = "♥";
+    const r = ask.getBoundingClientRect();
+    Object.assign(h.style, {
+      position: "fixed", left: r.left + 60 + "px", top: r.top + r.height - 60 + "px",
+      color: i % 2 ? "#ff8fa8" : "#ffe9b8", fontSize: 14 + Math.random() * 18 + "px",
+      pointerEvents: "none", transition: "transform 1.6s cubic-bezier(.1,.8,.3,1), opacity 1.6s", zIndex: 10
+    });
+    document.body.appendChild(h);
+    requestAnimationFrame(() => {
+      h.style.transform = `translate(${(Math.random() - .3) * 420}px, ${-Math.random() * 320 - 60}px) rotate(${Math.random() * 90 - 45}deg)`;
+      h.style.opacity = "0";
+    });
+    setTimeout(() => h.remove(), 1700);
+  }
+}
+</script>
+</body>
+</html>
